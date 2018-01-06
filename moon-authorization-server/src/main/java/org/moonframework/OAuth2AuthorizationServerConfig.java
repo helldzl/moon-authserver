@@ -1,5 +1,6 @@
 package org.moonframework;
 
+import org.moonframework.authorization.ApplicationUserAuthenticationConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +16,7 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.client.JdbcClientDetailsService;
+import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
@@ -67,7 +69,7 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
                 .scopes("read", "write")
                 .autoApprove(true)
                 .authorities("ROLE_USER", "ROLE_ADMIN", "ROLE_TRUST")
-                .accessTokenValiditySeconds(60)
+                .accessTokenValiditySeconds(600)
                 .refreshTokenValiditySeconds(7 * 24 * 3600)
                 .authorizedGrantTypes("implicit", "refresh_token", "password", "authorization_code");
     }
@@ -146,9 +148,17 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
      */
     @Bean
     protected JwtAccessTokenConverter jwtTokenEnhancer() {
-        KeyStoreKeyFactory keyStoreKeyFactory = new KeyStoreKeyFactory(new ClassPathResource("jwt.jks"), "quzile1984".toCharArray());
         JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
+
+        // token converter
+        DefaultAccessTokenConverter defaultAccessTokenConverter = new DefaultAccessTokenConverter();
+        defaultAccessTokenConverter.setUserTokenConverter(new ApplicationUserAuthenticationConverter());
+        converter.setAccessTokenConverter(defaultAccessTokenConverter);
+
+        // key
+        KeyStoreKeyFactory keyStoreKeyFactory = new KeyStoreKeyFactory(new ClassPathResource("jwt.jks"), "quzile1984".toCharArray());
         converter.setKeyPair(keyStoreKeyFactory.getKeyPair("jwt"));
+
         return converter;
     }
 

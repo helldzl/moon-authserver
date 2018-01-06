@@ -1,14 +1,12 @@
 package org.moonframework.authorization.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.moonframework.authorization.domain.ApplicationUser;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.NoSuchAlgorithmException;
@@ -21,16 +19,14 @@ import java.util.List;
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        System.out.println();
+        // TODO find user by username from DB
         // passwordEncoder.encode("123");
         // password : 123
-        UserDetails userDetails = new User(username, "$2a$04$8NrNVkxWANsoXTAck8nA2exln1Xoxag3XB8aiF5eMnXot5TO6asDW", true, true, true, true, permissions());
-        return userDetails;
+        ApplicationUser user = new ApplicationUser(username, "$2a$04$8NrNVkxWANsoXTAck8nA2exln1Xoxag3XB8aiF5eMnXot5TO6asDW", true, true, true, true, permissions());
+        user.setId(11L);
+        return user;
     }
 
     private Collection<? extends GrantedAuthority> permissions() {
