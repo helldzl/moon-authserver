@@ -17,7 +17,7 @@ public class WebController {
         return "read foo " + UUID.randomUUID().toString();
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN2')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping
     public String writeFoo() {
         return "write foo " + UUID.randomUUID().toString();
