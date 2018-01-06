@@ -1,0 +1,9 @@
+server:
+  port: 8081
+
+spring:
+  datasource:
+    url: jdbc:mariadb://192.168.1.138:3306/mifan_user_center?useUnicode=true&autoReconnect=true
+    username: root
+    password: budee123
+    driver-class-name: org.mariadb.jdbc.Driver
