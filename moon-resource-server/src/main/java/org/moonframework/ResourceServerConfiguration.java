@@ -16,6 +16,9 @@ import org.springframework.util.FileCopyUtils;
 
 import java.io.IOException;
 
+/**
+ * <p>The @EnableResourceServer annotation adds a filter of type OAuth2AuthenticationProcessingFilter automatically to the Spring Security filter chain.</p>
+ */
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableResourceServer

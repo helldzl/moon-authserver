@@ -8,6 +8,7 @@ import java.util.Collection;
 public class ApplicationUser extends User {
 
     private Long id;
+    private String email;
 
     public ApplicationUser(String username, String password, Collection<? extends GrantedAuthority> authorities) {
         super(username, password, authorities);
@@ -26,4 +27,11 @@ public class ApplicationUser extends User {
         this.id = id;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 }

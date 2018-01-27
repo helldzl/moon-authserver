@@ -26,6 +26,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         // password : 123
         ApplicationUser user = new ApplicationUser(username, "$2a$04$8NrNVkxWANsoXTAck8nA2exln1Xoxag3XB8aiF5eMnXot5TO6asDW", true, true, true, true, permissions());
         user.setId(11L);
+        user.setEmail("1949602@qq.com");
         return user;
     }
 

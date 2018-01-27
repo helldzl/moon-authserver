@@ -159,18 +159,18 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
      */
     @Bean
     protected JwtAccessTokenConverter jwtTokenEnhancer() {
-        JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
+        JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
 
         // token converter
         DefaultAccessTokenConverter defaultAccessTokenConverter = new DefaultAccessTokenConverter();
         defaultAccessTokenConverter.setUserTokenConverter(new ApplicationUserAuthenticationConverter());
-        converter.setAccessTokenConverter(defaultAccessTokenConverter);
+        jwtAccessTokenConverter.setAccessTokenConverter(defaultAccessTokenConverter);
 
         // key
         KeyStoreKeyFactory keyStoreKeyFactory = new KeyStoreKeyFactory(new ClassPathResource("jwt.jks"), "quzile1984".toCharArray());
-        converter.setKeyPair(keyStoreKeyFactory.getKeyPair("jwt"));
+        jwtAccessTokenConverter.setKeyPair(keyStoreKeyFactory.getKeyPair("jwt"));
 
-        return converter;
+        return jwtAccessTokenConverter;
     }
 
     /**
