@@ -1,6 +1,7 @@
 package org.moonframework;
 
 import org.moonframework.authorization.ApplicationUserAuthenticationConverter;
+import org.moonframework.authorization.filter.TokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -23,9 +24,7 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
 
-import javax.servlet.*;
 import javax.sql.DataSource;
-import java.io.IOException;
 
 /**
  * <p>The @EnableAuthorizationServer annotation is used to configure the OAuth 2.0 Authorization Server mechanism, together with any @Beans that implement AuthorizationServerConfigurer (there is a handy adapter implementation with empty methods). The following features are delegated to separate configurers that are created by Spring and passed into the AuthorizationServerConfigurer:</p>
@@ -57,6 +56,27 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
         this.dataSource = dataSource;
     }
 
+    /**
+     * <p>The public key (if available) is exposed by the Authorization Server on the /oauth/token_key endpoint, which is secure by default with access rule "denyAll()". You can open it up by injecting a standard SpEL expression into the AuthorizationServerSecurityConfigurer (e.g. "permitAll()" is probably adequate since it is a public key).</p>
+     *
+     * @param security security
+     * @throws Exception Exception
+     */
+    @Override
+    public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+        security
+                .tokenKeyAccess("permitAll()")
+                .checkTokenAccess("permitAll()")
+                .addTokenEndpointAuthenticationFilter(new TokenFilter());
+    }
+
+    /**
+     * <p>A configurer that defines the client details service. Client details can be initialized, or you can just refer to an existing store.</p>
+     * <p>NOTE: the schema for the JDBC service is not packaged with the library (because there are too many variations you might like to use in practice), but there is an example you can start from in the test code in github.</p>
+     *
+     * @param clients clients
+     * @throws Exception Exception
+     */
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         clients
@@ -68,8 +88,8 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
                 .secret("music")
                 .scopes("read", "write")
                 .autoApprove(true)
-                .authorities("ROLE_USER", "ROLE_ADMIN", "ROLE_TRUST")
-                .accessTokenValiditySeconds(600)
+                .authorities("ROLE_USER_1", "ROLE_ADMIN_1", "ROLE_TRUST_1")
+                .accessTokenValiditySeconds(60)
                 .refreshTokenValiditySeconds(7 * 24 * 3600)
                 .authorizedGrantTypes("implicit", "refresh_token", "password", "authorization_code");
     }
@@ -98,8 +118,12 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
         endpoints
-                .tokenStore(tokenStore())
-                .tokenEnhancer(jwtTokenEnhancer());
+                .tokenServices(tokenServices())
+        // .tokenStore(tokenStore())
+        // .tokenEnhancer(jwtTokenEnhancer())
+        ;
+
+        // endpoints.addInterceptor();
 
         // authenticationManager: password grants are switched on by injecting an AuthenticationManager.
         endpoints.authenticationManager(authenticationManager);
@@ -108,19 +132,6 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
         endpoints.userDetailsService(userDetailsService);
     }
 
-    /**
-     * <p>The public key (if available) is exposed by the Authorization Server on the /oauth/token_key endpoint, which is secure by default with access rule "denyAll()". You can open it up by injecting a standard SpEL expression into the AuthorizationServerSecurityConfigurer (e.g. "permitAll()" is probably adequate since it is a public key).</p>
-     *
-     * @param security security
-     * @throws Exception Exception
-     */
-    @Override
-    public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-        security
-                .tokenKeyAccess("permitAll()")
-                .checkTokenAccess("permitAll()")
-                .addTokenEndpointAuthenticationFilter(new TokenFilter());
-    }
 
     @Bean
     public ClientDetailsService clientDetails() {
@@ -182,28 +193,10 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
     public DefaultTokenServices tokenServices() {
         DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
         defaultTokenServices.setTokenStore(tokenStore());
+        defaultTokenServices.setTokenEnhancer(jwtTokenEnhancer());
         defaultTokenServices.setSupportRefreshToken(true);
+        defaultTokenServices.setAccessTokenValiditySeconds(600);
         return defaultTokenServices;
-    }
-
-    public static class TokenFilter implements Filter {
-
-        @Override
-        public void init(FilterConfig filterConfig) throws ServletException {
-            System.out.println();
-        }
-
-        @Override
-        public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-
-            // TODO something else
-            filterChain.doFilter(servletRequest, servletResponse);
-        }
-
-        @Override
-        public void destroy() {
-
-        }
     }
 
 }

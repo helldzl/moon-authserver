@@ -9,3 +9,6 @@ spring:
     username: root
     password: budee123
     driver-class-name: org.mariadb.jdbc.Driver
+  output:
+    ansi:
+      enabled: always
