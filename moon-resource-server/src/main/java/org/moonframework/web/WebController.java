@@ -22,6 +22,10 @@ public class WebController {
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping
     public String writeFoo() {
+        // PermissionEvaluator : https://docs.spring.io/spring-security/site/docs/4.2.3.RELEASE/reference/htmlsingle/#el-permission-evaluator
+        // SecurityExpressionRoot : Expression-Based Access Control
+
+
         SecurityContext context = SecurityContextHolder.getContext();
         Object principal = context.getAuthentication().getPrincipal();
         System.out.println(principal);
